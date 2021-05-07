@@ -1,16 +1,16 @@
 .App {
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-
-.App-header {
-  
-}
-
-.black-keys {
+.black {
   color: white;
+  padding: 10px;
 }
 
-.white-keys {
+.white {
   color: black;
+  padding: 10px;
 }
