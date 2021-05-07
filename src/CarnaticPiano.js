@@ -1,8 +1,9 @@
-import { Piano, MidiNumbers } from 'react-piano';
+import { Piano, MidiNumbers, KeyboardShortcuts } from 'react-piano';
 import Soundfont from 'soundfont-player';
 import 'react-piano/dist/styles.css';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import MenuItem from '@material-ui/core/MenuItem';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
@@ -24,78 +25,91 @@ Soundfont.instrument(ac, 'acoustic_grand_piano', { soundfont: 'MusyngKite' }).th
   piano = local_piano;
 });
 
+const westernToCarnatic = {
+    'C': {
+        carnatic: 'Sa',
+        western: 'C',
+        class: 'white',
+    },
+    'Db': {
+        carnatic: 'ri1',
+        western: 'C#',
+        class: 'black',
+    },
+    'D': {
+        carnatic: 'Ri',
+        western: 'D',
+        class: 'white',
+    },
+    'Eb': {
+        carnatic: 'ga1',
+        western: 'D#',
+        class: 'black',
+    },
+    'E': {
+        carnatic: 'Ga',
+        western: 'E',
+        class: 'white',
+    },
+    'F': {
+        carnatic: 'Ma',
+        western: 'F',
+        class: 'white',
+    },
+    'Gb': {
+        carnatic: 'Ma2',
+        western: 'F#',
+        class: 'black',
+    },
+    'G': {
+        carnatic: 'Pa',
+        western: 'G',
+        class: 'white',
+    },
+    'Ab': {
+        carnatic: 'da1',
+        western: 'G#',
+        class: 'black',
+    },
+    'A': {
+        carnatic: 'Da',
+        western: 'A',
+        class: 'white',
+    },
+    'Bb': {
+        carnatic: 'ni1',
+        western: 'A#',
+        class: 'black',
+    },
+    'B': {
+        carnatic: 'Ni',
+        western: 'B',
+        class: 'white',
+    },
+}
+
 function CarnaticPiano() {
     const firstNote = MidiNumbers.fromNote('c3');
     const lastNote = MidiNumbers.fromNote('b3');
-    const keyMap = {
-        48: {
-            carnatic: 'Sa',
-            western: 'C',
-            class: 'white',
-        },
-        49: {
-            carnatic: 'ri1',
-            western: 'C#',
-            class: 'black',
-        },
-        50: {
-            carnatic: 'Ri',
-            western: 'D',
-            class: 'white',
-        },
-        51: {
-            carnatic: 'ga1',
-            western: 'D#',
-            class: 'black',
-        },
-        52: {
-            carnatic: 'Ga',
-            western: 'E',
-            class: 'white',
-        },
-        53: {
-            carnatic: 'Ma',
-            western: 'F',
-            class: 'white',
-        },
-        54: {
-            carnatic: 'Ma2',
-            western: 'F#',
-            class: 'black',
-        },
-        55: {
-            carnatic: 'Pa',
-            western: 'G',
-            class: 'white',
-        },
-        56: {
-            carnatic: 'da1',
-            western: 'G#',
-            class: 'black',
-        },
-        57: {
-            carnatic: 'Da',
-            western: 'A',
-            class: 'white',
-        },
-        58: {
-            carnatic: 'ni1',
-            western: 'A#',
-            class: 'black',
-        },
-        59: {
-            carnatic: 'Ni',
-            western: 'B',
-            class: 'white',
-        },
-    }
+    const keyboardShortcuts = KeyboardShortcuts.create({
+        firstNote: firstNote,
+        lastNote: lastNote,
+        keyboardConfig: KeyboardShortcuts.HOME_ROW,
+      });
 
     const [key, setKey] = React.useState(0);
     const [isLoopOn, setIsLoopOn] = React.useState(false);
     const [instrument, setInstrument] = React.useState("acoustic_grand_piano");
+    const [octave, setOctave] = React.useState(3);
 
     const handleChange = (event) => {
         setKey(event.target.value);
+    };
+
+    const handleOctaveChange = (newOctave) => {
+        if(newOctave >= 1 && newOctave <= 7) {
+            setOctave(newOctave);
+        }
     };
 
     const handleInstrumentChange = async (event) => {
@@ -152,24 +166,33 @@ function CarnaticPiano() {
                     <MenuItem value="violin">{"violin".replace(/_/gi, " ")}</MenuItem>
                 </Select>
                 <Divider orientation="vertical" flexItem />
+                Octave
+                <ButtonGroup disableElevation variant="contained" color="primary">
+                    <Button onClick={() => { handleOctaveChange(octave - 1) }}>-</Button>
+                    <Button disabled>{octave}</Button>
+                    <Button onClick={() => { handleOctaveChange(octave + 1) }}>+</Button>
+                </ButtonGroup>
+                <Divider orientation="vertical" flexItem />
                 <Button variant="contained" color="primary" onClick={() => { piano.stop() }}>STOP</Button>
             </Grid>
             <Piano
-            noteRange={{ first: firstNote, last: lastNote }}
-            playNote={(midiNumber) => {
+                keyboardShortcuts={keyboardShortcuts}
+                noteRange={{ first: firstNote + ((octave - 3)*12), last: lastNote + ((octave - 3)*12)}}
+                playNote={(midiNumber) => {
+                    piano.stop()
+                    piano.play(midiNumber + key, null, { loop: isLoopOn })
+                }}
+                stopNote={(midiNumber) => {
                 
-                piano.stop()
-                piano.play(midiNumber + key, null, { loop: isLoopOn })
-            }}
-            stopNote={(midiNumber) => {
-                
-            }}
-            width={1000}
-            renderNoteLabel={
-                ({keyboardShortcut, midiNumber, isActive, isAccidental}) => {
-                    return <div className={keyMap[midiNumber].class}>{keyMap[midiNumber].carnatic}</div>
+                }}
+                width={1000}
+                renderNoteLabel={
+                    ({keyboardShortcut, midiNumber, isActive, isAccidental}) => {
+                        const pitch = MidiNumbers.getAttributes(midiNumber).pitchName;
+
+                        return <div className={westernToCarnatic[pitch].class}>{westernToCarnatic[pitch].carnatic}</div>
+                    }
                 }
-            }
             />
         </div>
     )
