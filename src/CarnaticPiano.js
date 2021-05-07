@@ -97,9 +97,10 @@ function CarnaticPiano() {
     const [instrument, setInstrument] = React.useState("acoustic_grand_piano");
     const [octave, setOctave] = React.useState(3);
     const [keysVisible, setKeysVisible] = React.useState(12);
-
-    const firstNote = MidiNumbers.fromNote('c3');
-    const lastNote = firstNote + keysVisible;
+    
+    const [firstNote, setFirstNote] = React.useState(MidiNumbers.fromNote('c3'));
+    
+    const [lastNote, setLastNote] = React.useState(MidiNumbers.fromNote('c3') + keysVisible);
 
     const keyboardShortcuts = KeyboardShortcuts.create({
         firstNote: firstNote,
@@ -120,12 +121,18 @@ function CarnaticPiano() {
     const handleVisibleKeysChange = (keysVisible) => {
         if(keysVisible >= 8 && keysVisible <= 25) {
             setKeysVisible(keysVisible);
+            setLastNote(firstNote + keysVisible);
         }
     };
 
     const handleInstrumentChange = async (event) => {
         piano = await Soundfont.instrument(ac, event.target.value, { soundfont: 'MusyngKite' });
         setInstrument(event.target.value);
+    };
+
+    const handleShift = (shift) => {
+        setFirstNote(firstNote+shift);
+        setLastNote(lastNote+shift);
     };
 
     const classes = useStyles();
@@ -189,6 +196,12 @@ function CarnaticPiano() {
                     <Button onClick={() => { handleVisibleKeysChange(keysVisible - 1) }}>-</Button>
                     <Button disabled>{keysVisible}</Button>
                     <Button onClick={() => { handleVisibleKeysChange(keysVisible + 1) }}>+</Button>
+                </ButtonGroup>
+                <Divider orientation="vertical" flexItem />
+                Shift Keys
+                <ButtonGroup disableElevation variant="contained" color="primary">
+                    <Button onClick={() => { handleShift(-1) }}>{"<"}</Button>
+                    <Button onClick={() => { handleShift(+1) }}>{">"}</Button>
                 </ButtonGroup>
                 <Divider orientation="vertical" flexItem />
                 <Button variant="contained" color="primary" onClick={() => { piano.stop() }}>STOP</Button>
