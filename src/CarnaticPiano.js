@@ -5,6 +5,8 @@ import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import Checkbox from '@material-ui/core/Checkbox';
+import Grid from '@material-ui/core/Grid';
+import Divider from '@material-ui/core/Divider';
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -90,40 +92,68 @@ function CarnaticPiano() {
 
     const [key, setKey] = React.useState(0);
     const [isLoopOn, setIsLoopOn] = React.useState(false);
+    const [instrument, setInstrument] = React.useState("acoustic_grand_piano");
 
     const handleChange = (event) => {
         setKey(event.target.value);
+    };
+
+    const handleInstrumentChange = async (event) => {
+        piano = await Soundfont.instrument(ac, event.target.value, { soundfont: 'MusyngKite' });
+        setInstrument(event.target.value);
     };
 
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
-            Key - Kattai
-            <Select value={key} onChange={handleChange} >
-            <MenuItem value={0}>Sa - C - 1</MenuItem>
-            <MenuItem value={1}>ri1 - C# - 1.5</MenuItem>
-            <MenuItem value={2}>Ri - D - 2</MenuItem>
-            <MenuItem value={3}>ga1 - D# - 2.5</MenuItem>
-            <MenuItem value={4}>Ga - E - 3</MenuItem>
-            <MenuItem value={5}>Ma - F - 4</MenuItem>
-            <MenuItem value={6}>Ma2 - F# - 4.5</MenuItem>
-            <MenuItem value={7}>Pa - G - 5</MenuItem>
-            <MenuItem value={8}>da1 - G# - 5.5</MenuItem>
-            <MenuItem value={9}>Da - A - 6</MenuItem>
-            <MenuItem value={10}>ni1 - A# - 6.5</MenuItem>
-            <MenuItem value={11}>Ni - B - 7</MenuItem>
-            </Select>
 
-            Loop
-            <Checkbox
-                color="primary"
-                onChange={(event) => {
-                    setIsLoopOn(event.target.checked);
-                  }}
-            />
+            <Grid container alignItems="center" className={classes.root}>
+                Key - Kattai
+                <Select value={key} onChange={handleChange} >
+                    <MenuItem value={0}>Sa - C - 1</MenuItem>
+                    <MenuItem value={1}>ri1 - C# - 1.5</MenuItem>
+                    <MenuItem value={2}>Ri - D - 2</MenuItem>
+                    <MenuItem value={3}>ga1 - D# - 2.5</MenuItem>
+                    <MenuItem value={4}>Ga - E - 3</MenuItem>
+                    <MenuItem value={5}>Ma - F - 4</MenuItem>
+                    <MenuItem value={6}>Ma2 - F# - 4.5</MenuItem>
+                    <MenuItem value={7}>Pa - G - 5</MenuItem>
+                    <MenuItem value={8}>da1 - G# - 5.5</MenuItem>
+                    <MenuItem value={9}>Da - A - 6</MenuItem>
+                    <MenuItem value={10}>ni1 - A# - 6.5</MenuItem>
+                    <MenuItem value={11}>Ni - B - 7</MenuItem>
+                </Select>
 
-            <Button variant="contained" color="primary" onClick={() => { piano.stop() }}>STOP</Button>
+                <Divider orientation="vertical" flexItem />
+                Loop
+                <Checkbox
+                    color="primary"
+                    onChange={(event) => {
+                        setIsLoopOn(event.target.checked);
+                    }}
+                />
+                <Divider orientation="vertical" flexItem />
+                Instrument
+                <Select value={instrument} onChange={handleInstrumentChange} >
+                    <MenuItem value="acoustic_grand_piano">{"acoustic_grand_piano".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="acoustic_guitar_nylon">{"acoustic_guitar_nylon".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="acoustic_guitar_steel">{"acoustic_guitar_steel".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="cello">{"cello".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="fiddle">{"fiddle".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="flute">{"flute".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="harmonica">{"harmonica".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="kalimba">{"kalimba".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="ocarina">{"ocarina".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="piccolo">{"piccolo".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="recorder">{"recorder".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="shanai">{"shanai".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="viola">{"viola".replace(/_/gi, " ")}</MenuItem>
+                    <MenuItem value="violin">{"violin".replace(/_/gi, " ")}</MenuItem>
+                </Select>
+                <Divider orientation="vertical" flexItem />
+                <Button variant="contained" color="primary" onClick={() => { piano.stop() }}>STOP</Button>
+            </Grid>
             <Piano
             noteRange={{ first: firstNote, last: lastNote }}
             playNote={(midiNumber) => {
