@@ -89,18 +89,23 @@ const westernToCarnatic = {
 }
 
 function CarnaticPiano() {
-    const firstNote = MidiNumbers.fromNote('c3');
-    const lastNote = MidiNumbers.fromNote('b3');
-    const keyboardShortcuts = KeyboardShortcuts.create({
-        firstNote: firstNote,
-        lastNote: lastNote,
-        keyboardConfig: KeyboardShortcuts.HOME_ROW,
-      });
+    
+    
 
     const [key, setKey] = React.useState(0);
     const [isLoopOn, setIsLoopOn] = React.useState(false);
     const [instrument, setInstrument] = React.useState("acoustic_grand_piano");
     const [octave, setOctave] = React.useState(3);
+    const [keysVisible, setKeysVisible] = React.useState(12);
+
+    const firstNote = MidiNumbers.fromNote('c3');
+    const lastNote = firstNote + keysVisible;
+
+    const keyboardShortcuts = KeyboardShortcuts.create({
+        firstNote: firstNote,
+        lastNote: lastNote,
+        keyboardConfig: KeyboardShortcuts.HOME_ROW,
+      });
 
     const handleChange = (event) => {
         setKey(event.target.value);
@@ -109,6 +114,12 @@ function CarnaticPiano() {
     const handleOctaveChange = (newOctave) => {
         if(newOctave >= 1 && newOctave <= 7) {
             setOctave(newOctave);
+        }
+    };
+
+    const handleVisibleKeysChange = (keysVisible) => {
+        if(keysVisible >= 8 && keysVisible <= 25) {
+            setKeysVisible(keysVisible);
         }
     };
 
@@ -171,6 +182,13 @@ function CarnaticPiano() {
                     <Button onClick={() => { handleOctaveChange(octave - 1) }}>-</Button>
                     <Button disabled>{octave}</Button>
                     <Button onClick={() => { handleOctaveChange(octave + 1) }}>+</Button>
+                </ButtonGroup>
+                <Divider orientation="vertical" flexItem />
+                Keys Visible
+                <ButtonGroup disableElevation variant="contained" color="primary">
+                    <Button onClick={() => { handleVisibleKeysChange(keysVisible - 1) }}>-</Button>
+                    <Button disabled>{keysVisible}</Button>
+                    <Button onClick={() => { handleVisibleKeysChange(keysVisible + 1) }}>+</Button>
                 </ButtonGroup>
                 <Divider orientation="vertical" flexItem />
                 <Button variant="contained" color="primary" onClick={() => { piano.stop() }}>STOP</Button>
