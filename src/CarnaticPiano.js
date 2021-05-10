@@ -118,10 +118,17 @@ function CarnaticPiano() {
         }
     };
 
-    const handleVisibleKeysChange = (keysVisible) => {
-        if(keysVisible >= 8 && keysVisible <= 25) {
-            setKeysVisible(keysVisible);
-            setLastNote(firstNote + keysVisible);
+    const handleVisibleKeysChange = (newKeysVisible) => {
+        if(newKeysVisible >= 8 && newKeysVisible <= 25) {
+            const lastKey = MidiNumbers.getAttributes(firstNote + newKeysVisible).pitchName
+            if(['Bb','Ab','Gb','Eb','Db'].includes(lastKey)) {
+                setKeysVisible(newKeysVisible + (newKeysVisible - keysVisible));
+                setLastNote(firstNote + newKeysVisible + (newKeysVisible - keysVisible));
+            } else {
+                setKeysVisible(newKeysVisible);
+                setLastNote(firstNote + newKeysVisible);
+            }
+            
         }
     };
 
