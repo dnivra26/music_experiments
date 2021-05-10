@@ -138,8 +138,22 @@ function CarnaticPiano() {
     };
 
     const handleShift = (shift) => {
-        setFirstNote(firstNote+shift);
-        setLastNote(lastNote+shift);
+
+        const newFirst = MidiNumbers.getAttributes(firstNote+shift).pitchName
+        const newLast = MidiNumbers.getAttributes(lastNote+shift).pitchName
+
+        if(['Bb','Ab','Gb','Eb','Db'].includes(newFirst)) {
+            setFirstNote(firstNote+(shift*2));
+        } else {
+            setFirstNote(firstNote+shift);
+        }
+        
+        if(['Bb','Ab','Gb','Eb','Db'].includes(newLast)) {
+            setLastNote(lastNote+(shift*2));
+        } else {
+            setLastNote(lastNote+shift);
+        }
+        
     };
 
     const classes = useStyles();
